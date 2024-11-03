@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("application")
 }
 
 group = "no.nav"
@@ -7,6 +8,10 @@ version = "1.0"
 
 repositories {
     mavenCentral()
+}
+
+application {
+    mainClass.set("no.nav.Main") // Sett til fullstendig pakke- og klassenavn til Main-klassen
 }
 
 dependencies {

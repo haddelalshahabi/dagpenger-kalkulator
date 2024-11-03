@@ -1,47 +1,63 @@
 package no.nav.grunnbeløp;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Verktøy med forskjellige hjelpemetoder til å kalkulere forskjellige grunnbeløpsverdier, som
- * bruker i prossesen for å kalkulere hvilken dagsats en person har rett på. Grunnbeløpet brukt
- * i disse metodene hente fra NAV sitt grunnebeløp API.
- *
+ * Verktøyklasse med forskjellige hjelpemetoder for å kalkulere grunnbeløpsverdier,
+ * som brukes i prosessen for å beregne hvilken dagsats en person har rett på.
+ * Grunnbeløpet hentes fra NAV sitt grunnbeløp API.
+ * 
  * @author Emil Elton Nilsen
  * @version 1.0
  */
 public class GrunnbeløpVerktøy {
-
+    // Lagrer grunnbeløpet som brukes i beregningene.
     private double grunnbeløp;
 
+    /**
+     * Standardkonstruktør som henter grunnbeløpet fra API'et.
+     * Setter grunnbeløpet til 0 hvis det oppstår en feil under henting.
+     */
     public GrunnbeløpVerktøy() {
         try {
             this.grunnbeløp = new GrunnbeløpAPI().hentGrunnbeløp();
-        } catch (IOException | InterruptedException exception) {
-            System.out.println("Problemer med tilkobling til grunnbeløp API'et" + exception.getMessage());
+        } catch (IOException | InterruptedException e) {
+            // Setter grunnbeløpet til 0 som en standardverdi ved feil og logger feilen.
+            Logger.getLogger(GrunnbeløpVerktøy.class.getName()).log(Level.SEVERE, "Feil ved henting av grunnbeløp", e);
+            this.grunnbeløp = 0; 
         }
     }
 
     /**
-     * Kalkulerer det totale grunnbeløpet for gitt antall år.
-     * @param antallÅr antall år med grunnbeløp å kalkulere.
-     * @return grunnbeløpet over gitt antall år.
+     * Konstruktør for testing som lar brukeren sette grunnbeløpet manuelt.
+     * @param grunnbeløpForTest grunnbeløp som brukes for testing.
+     */
+    public GrunnbeløpVerktøy(double grunnbeløpForTest) {
+        this.grunnbeløp = grunnbeløpForTest;
+    }
+
+    /**
+     * Beregner det totale grunnbeløpet over et gitt antall år.
+     * @param antallÅr antall år som skal brukes i beregningen.
+     * @return total grunnbeløp for det gitte antall år.
      */
     public double hentTotaltGrunnbeløpForGittAntallÅr(int antallÅr) {
         return this.grunnbeløp * antallÅr;
     }
 
     /**
-     * Kalkulerer hvor mye en person må tjene det siste året for å ha rett på dagpenger.
-     * @return 1.5G basert på dagens grunnbeløp.
+     * Beregner minimum årslønn som kreves for å ha rett til dagpenger, som er 1.5 ganger grunnbeløpet.
+     * @return minimum årslønn for å ha rett på dagpenger.
      */
     public double hentMinimumÅrslønnForRettPåDagpenger() {
         return this.grunnbeløp * 1.5;
     }
 
     /**
-     * Kalkulerer hvor høyt maks årlig dagpengegrunnlag kan være.
-     * @return 6G basert på dagens grunnbeløp.
+     * Beregner maksimal årlig dagpengegrunnlag, som er 6 ganger grunnbeløpet.
+     * @return maksimalt årlig dagpengegrunnlag.
      */
     public double hentMaksÅrligDagpengegrunnlag() {
         return this.grunnbeløp * 6;
